@@ -14,9 +14,7 @@ class SpaceGame(GameApp):
     def init_game(self):
         self.ship = Ship(self, CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2)
 
-        self.level = 1
-        self.level_text = Text(self, '', 100, 580)
-        self.update_level_text()
+        self.level_text = StatusWithText(self, 100, 580, 'level: %d', 1)
 
         self.score_wait = 0
         self.score = StatusWithText(self, 100, 20, 'Score: %d', 0)
@@ -61,17 +59,14 @@ class SpaceGame(GameApp):
                 self.ship.x - BOMB_RADIUS, 
                 self.ship.y - BOMB_RADIUS,
                 self.ship.x + BOMB_RADIUS, 
-                self.ship.y + BOMB_RADIUS
+                self.ship.y + BOMB_RADIUS, outline='blue'
             )
 
-            self.after(200, lambda: self.canvas.delete(self.bomb_canvas_id))
+            self.after(50, lambda: self.canvas.delete(self.bomb_canvas_id))
 
             for e in self.enemies:
                 if self.ship.distance_to(e) <= BOMB_RADIUS:
                     e.to_be_deleted = True
-
-    def update_level_text(self):
-        self.level_text.set_text('Level: %d' % self.level)
 
     def update_score(self):
         self.score_wait += 1
@@ -87,7 +82,6 @@ class SpaceGame(GameApp):
 
     def create_enemies(self):
         p = random()
-
         for prob, strategy in self.enemy_creation_strategies:
             if p < prob:
                 enemies = strategy.generate(self, self.ship)
